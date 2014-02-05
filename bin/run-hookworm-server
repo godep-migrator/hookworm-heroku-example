@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+export PATH="/app/.gem/ruby/1.9.1/bin:$PATH:$PWD"
+
+cd $(dirname $(dirname $0))
+
+if ! bundle version 2>/dev/null ; then
+  gem install --user-install --no-ri --no-rdoc bundler
+fi
+
+bundle install --deployment
+
+export HOOKWORM_WORKING_DIR="${HOOKWORM_WORKING_DIR:-/tmp}"
+export HOOKWORM_WORM_DIR="${HOOKWORM_WORM_DIR:-/app/worm.d}"
+
+exec bundle exec hookworm-heroku-example "$@"
