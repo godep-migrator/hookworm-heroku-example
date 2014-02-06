@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    hookworm-base (0.3.2)
+    hookworm-base (0.3.5)
     hookworm-handlers (0.2.1)
       hookworm-base
 
