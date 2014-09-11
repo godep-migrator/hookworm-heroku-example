@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+# vim:fileencoding=utf-8
+
+exe = "#{ENV['GOPATH'].split(':').first}/bin/hookworm-server"
+$stdout.puts $stdin.read.sub(/___USAGE___/, `#{exe} -h 2>&1`.chomp)

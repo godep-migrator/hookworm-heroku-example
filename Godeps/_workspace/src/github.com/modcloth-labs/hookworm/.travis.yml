@@ -1,0 +1,65 @@
+---
+language: go
+go:
+- 1.2
+- tip
+env:
+  global:
+  - PATH=$HOME/gopath/bin:$PATH
+before_install:
+- go get -x github.com/kr/godep
+- go get -x code.google.com/p/go.tools/cmd/cover
+- rvm use 2.0.0 --install --binary --fuzzy
+install: make build
+script: make test
+deploy:
+- provider: s3
+  access_key_id:
+    secure: "fWjfLbztWev7WYMDlaugu2LDMUL9K3rgM76n5VHzr5lbt/TRpjvxes4yqGMqNXyzsw4I2ogc2yWBc3bHMxlkeaEYxITGnWq6XdPtICqY0OYCVTmysp5tShTMj8bivUoTyKAMiQyhDNZ+HF3zZZllXpdoIjVIOZEh2XdxvXX4bUY="
+  secret_access_key:
+    secure: "YVen0yrhXh5LiGJGJoMdzE7rgpCExvDAdq36ndZPwWfziTF0nHwify7oK4mlEHS9pJJbnFdLmO7jwLgf0eY6Ft64xJ4+8G9aSN+wtAKpFl6WPhC5w/Q1zjkZly2BAF5bAkL2r/ZfnOyNgQ30cpdQ4rvLTmSZyn+cx9gUcSnPpDE="
+  bucket: modcloth-public-travis-artifacts
+  skip_cleanup: true
+  local-dir: $TRAVIS_BUILD_DIR/build/.tarball/
+  upload-dir: artifacts/binaries/$(go env GOOS)/$(go env GOARCH)/hookworm/$TRAVIS_COMMIT
+  on:
+    all_branches: true
+    go: 1.2
+- provider: s3
+  access_key_id:
+    secure: "fWjfLbztWev7WYMDlaugu2LDMUL9K3rgM76n5VHzr5lbt/TRpjvxes4yqGMqNXyzsw4I2ogc2yWBc3bHMxlkeaEYxITGnWq6XdPtICqY0OYCVTmysp5tShTMj8bivUoTyKAMiQyhDNZ+HF3zZZllXpdoIjVIOZEh2XdxvXX4bUY="
+  secret_access_key:
+    secure: "YVen0yrhXh5LiGJGJoMdzE7rgpCExvDAdq36ndZPwWfziTF0nHwify7oK4mlEHS9pJJbnFdLmO7jwLgf0eY6Ft64xJ4+8G9aSN+wtAKpFl6WPhC5w/Q1zjkZly2BAF5bAkL2r/ZfnOyNgQ30cpdQ4rvLTmSZyn+cx9gUcSnPpDE="
+  bucket: modcloth-public-travis-artifacts
+  skip_cleanup: true
+  local-dir: $TRAVIS_BUILD_DIR/build/.tarball/
+  upload-dir: artifacts/binaries/$(go env GOOS)/$(go env GOARCH)/hookworm/$TRAVIS_BRANCH
+  on:
+    all_branches: true
+    go: 1.2
+- provider: s3
+  access_key_id:
+    secure: "fWjfLbztWev7WYMDlaugu2LDMUL9K3rgM76n5VHzr5lbt/TRpjvxes4yqGMqNXyzsw4I2ogc2yWBc3bHMxlkeaEYxITGnWq6XdPtICqY0OYCVTmysp5tShTMj8bivUoTyKAMiQyhDNZ+HF3zZZllXpdoIjVIOZEh2XdxvXX4bUY="
+  secret_access_key:
+    secure: "YVen0yrhXh5LiGJGJoMdzE7rgpCExvDAdq36ndZPwWfziTF0nHwify7oK4mlEHS9pJJbnFdLmO7jwLgf0eY6Ft64xJ4+8G9aSN+wtAKpFl6WPhC5w/Q1zjkZly2BAF5bAkL2r/ZfnOyNgQ30cpdQ4rvLTmSZyn+cx9gUcSnPpDE="
+  bucket: modcloth-public-travis-artifacts
+  skip_cleanup: true
+  local-dir: $TRAVIS_BUILD_DIR/build/.tarball/
+  upload-dir: artifacts/binaries/$(go env GOOS)/$(go env GOARCH)/hookworm/$(git describe --always --tags)
+  on:
+    all_branches: true
+    go: 1.2
+after_success:
+- mkdir -p $TRAVIS_BUILD_DIR/build/hookworm
+           $TRAVIS_BUILD_DIR/build/.tarball &&
+  cd $TRAVIS_BUILD_DIR &&
+  cp $HOME/gopath/bin/hookworm-server $TRAVIS_BUILD_DIR/build/hookworm/ &&
+  git archive HEAD | bzip2 >
+    $TRAVIS_BUILD_DIR/build/.tarball/hookworm.src.tar.bz2 &&
+  cd $TRAVIS_BUILD_DIR/build &&
+  tar cjvf hookworm.tar.bz2 hookworm &&
+  mv -v hookworm.tar.bz2 .tarball/ &&
+  cd .tarball/ &&
+  sha256sum hookworm.tar.bz2 hookworm.src.tar.bz2 > SHA256SUMS
+notifications:
+  email: github+hookworm@modcloth.com

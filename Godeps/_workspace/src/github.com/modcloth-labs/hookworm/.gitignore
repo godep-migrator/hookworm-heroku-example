@@ -1,0 +1,14 @@
+/tags
+/log/
+/tests.log
+/mtbb
+/fakesmtpd
+/.mtbb-artifacts/
+/.vagrant/
+
+*.test
+*.cfg.json
+
+/worm.d/
+/coverage.out
+/coverage.html
